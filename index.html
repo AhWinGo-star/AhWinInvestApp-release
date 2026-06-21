@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title id="page-title">AhWinGo - 專屬下載與安裝</title>
+  <style>
+    :root {
+      --bg-gradient: linear-gradient(135deg, #0f0c1b 0%, #1a103c 50%, #05021a 100%);
+      --accent-color: #ff3b30;
+      --accent-gold: linear-gradient(135deg, #ffd700 0%, #ffa500 100%);
+      --glass-bg: rgba(255, 255, 255, 0.05);
+      --glass-border: rgba(255, 255, 255, 0.08);
+      --text-main: #f5f5f7;
+      --text-sub: #a1a1a6;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+
+    body {
+      background: var(--bg-gradient);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      overflow-x: hidden;
+    }
+
+    /* Background decorative glow elements */
+    .glow {
+      position: absolute;
+      width: 300px;
+      height: 300px;
+      background: radial-gradient(circle, rgba(255, 59, 48, 0.15) 0%, rgba(0, 0, 0, 0) 70%);
+      border-radius: 50%;
+      z-index: 1;
+      pointer-events: none;
+    }
+    .glow-1 { top: 10%; left: 10%; }
+    .glow-2 { bottom: 10%; right: 10%; }
+
+    .card {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-radius: 24px;
+      width: 100%;
+      max-width: 450px;
+      padding: 40px 30px;
+      text-align: center;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+      z-index: 2;
+      animation: fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .logo-container {
+      margin-bottom: 25px;
+      position: relative;
+      display: inline-block;
+    }
+
+    .logo-icon {
+      width: 90px;
+      height: 90px;
+      background: linear-gradient(135deg, #e52d27 0%, #b31217 100%);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 24px rgba(229, 45, 39, 0.4);
+      margin: 0 auto;
+      border: 2px solid rgba(255, 255, 255, 0.1);
+      position: relative;
+    }
+
+    .logo-icon::before {
+      content: "🐂";
+      font-size: 45px;
+      line-height: 1;
+    }
+
+    .logo-glow {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: inherit;
+      filter: blur(15px);
+      opacity: 0.5;
+      z-index: -1;
+      animation: pulse 2s infinite alternate;
+    }
+
+    @keyframes pulse {
+      from { transform: scale(1); opacity: 0.3; }
+      to { transform: scale(1.15); opacity: 0.6; }
+    }
+
+    h1 {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 10px;
+      background: linear-gradient(to right, #ffffff, #d2d2d7);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: 0.5px;
+    }
+
+    .status-text {
+      color: var(--text-sub);
+      font-size: 15px;
+      line-height: 1.6;
+      margin-bottom: 35px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      padding: 16px 24px;
+      font-size: 16px;
+      font-weight: 600;
+      border-radius: 14px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+      text-decoration: none;
+      margin-bottom: 15px;
+    }
+
+    .btn-primary {
+      background: var(--accent-gold);
+      color: #000000;
+      box-shadow: 0 4px 15px rgba(255, 165, 0, 0.3);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-primary::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: -50%;
+      width: 200%;
+      height: 100%;
+      background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.3) 50%, rgba(255,255,255,0) 100%);
+      transform: skewX(-25deg);
+      transition: 0.75s;
+      animation: shine 3s infinite;
+    }
+
+    @keyframes shine {
+      0% { left: -100%; }
+      50% { left: 100%; }
+      100% { left: 100%; }
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(255, 165, 0, 0.4);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: var(--text-main);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .footer-note {
+      font-size: 12px;
+      color: var(--text-sub);
+      margin-top: 25px;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      padding-top: 20px;
+    }
+
+    .footer-note a {
+      color: #e52d27;
+      text-decoration: none;
+    }
+    
+    .footer-note a:hover {
+      text-decoration: underline;
+    }
+
+    .loading-dots::after {
+      content: " .";
+      animation: dots 1.5s steps(5, end) infinite;
+    }
+
+    @keyframes dots {
+      0%, 20% { content: ""; }
+      40% { content: "."; }
+      60% { content: ".."; }
+      80%, 100% { content: "..."; }
+    }
+  </style>
+</head>
+<body>
+  <div class="glow glow-1"></div>
+  <div class="glow glow-2"></div>
+
+  <div class="card">
+    <div class="logo-container">
+      <div class="logo-icon"></div>
+      <div class="logo-glow"></div>
+    </div>
+    
+    <h1>AhWinGo</h1>
+    <p class="status-text" id="status-desc">
+      正在載入下載通道...
+    </p>
+
+    <!-- Primary Action Button -->
+    <a href="#" class="btn btn-primary" id="btn-primary-action">立即下載最新版 App (APK)</a>
+    
+    <!-- Secondary Action Button -->
+    <a href="taiwan-stock-screener.apk?v=1.0.28" class="btn btn-secondary" id="btn-secondary-action">下載最新版 App (APK)</a>
+
+    <div class="footer-note" id="footer-text">
+      提示：軟體在第一次開啟時需要輸入授權密碼啟用。
+    </div>
+  </div>
+
+  <script>
+    const searchString = window.location.search;
+    const isImportMode = searchString.indexOf('data=') !== -1;
+
+    const pageTitle = document.getElementById('page-title');
+    const statusDesc = document.getElementById('status-desc');
+    const primaryBtn = document.getElementById('btn-primary-action');
+    const secondaryBtn = document.getElementById('btn-secondary-action');
+    const footerText = document.getElementById('footer-text');
+
+    if (isImportMode) {
+      // === 匯入群組模式 ===
+      pageTitle.innerText = "AhWinGo - 匯入自選股群組";
+      statusDesc.innerHTML = '偵測到自選群組分享資料。<br><span class="loading-dots" style="color: #ffd700; font-weight: 500;">正在嘗試自動喚起 App</span>';
+      
+      const customSchemeUrl = 'awin://import' + searchString;
+      primaryBtn.innerText = "開啟應用程式 (App)";
+      primaryBtn.href = customSchemeUrl;
+      
+      secondaryBtn.innerText = "下載最新版 App (APK)";
+      secondaryBtn.href = "taiwan-stock-screener.apk?v=1.0.28";
+      secondaryBtn.style.display = "inline-flex";
+      
+      footerText.innerHTML = '提示：若點擊無反應，請先確保手機已安裝 <a href="taiwan-stock-screener.apk?v=1.0.28">AhWinGo App</a>。<br>軟體在第一次開啟時需要輸入授權密碼啟用。';
+      
+      // 自動喚起 App
+      window.location.href = customSchemeUrl;
+      setTimeout(() => {
+        statusDesc.innerHTML = '如果 App 沒有自動開啟，請點擊上方黃色按鈕進行手動呼叫。<br>初次使用請先下載並安裝下方 APK 安裝檔。';
+      }, 2500);
+    } else {
+      // === 純下載首頁模式 ===
+      pageTitle.innerText = "AhWinGo - 專屬下載與安裝";
+      statusDesc.innerHTML = '此頁面為 AhWinGo 內部工具專屬下載通道。<br>請點選下方按鈕下載並安裝最新版 App。';
+      
+      primaryBtn.innerText = "立即下載最新版 App (APK)";
+      primaryBtn.href = "taiwan-stock-screener.apk?v=1.0.28";
+      
+      secondaryBtn.style.display = "none";
+      footerText.innerHTML = '提示：下載完成後，請點擊安裝包進行安裝。<br>軟體首次啟動需要輸入授權密碼。';
+    }
+  </script>
+</body>
+</html>
