@@ -1,0 +1,1787 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="AhWinGo 融資精算">
+  <title>AhWinGo 個股融資維持率雙引擎精算系統 (iOS / 電腦通用版)</title>
+  <link rel="icon" href="icon.png" type="image/png">
+  <link rel="apple-touch-icon" href="icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: #080b11;
+      --bg-secondary: #101622;
+      --bg-card: rgba(16, 22, 34, 0.85);
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --border-focus: rgba(99, 102, 241, 0.55);
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --accent-indigo: #6366f1;
+      --accent-cyan: #38bdf8;
+      --accent-amber: #f59e0b;
+      --up-red: #ff4d4f;
+      --down-green: #10b981;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background: radial-gradient(circle at 50% 0%, #131c31 0%, #080b11 70%);
+      color: var(--text-primary);
+      font-family: 'Outfit', 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;
+      min-height: 100vh;
+      padding-bottom: 60px;
+      line-height: 1.45;
+    }
+
+    /* Top Header */
+    .top-bar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(8, 11, 17, 0.88);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border-subtle);
+      padding: max(12px, env(safe-area-inset-top)) 16px 12px;
+    }
+
+    .top-bar-inner {
+      max-width: 1240px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .brand-wrap {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .brand-logo {
+      font-size: 1.35rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 55%, #f472b6 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .brand-tag {
+      font-size: 0.72rem;
+      color: var(--text-secondary);
+      background: rgba(99, 102, 241, 0.14);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      color: #a5b4fc;
+      padding: 2px 8px;
+      border-radius: 99px;
+      font-weight: 600;
+    }
+
+    .top-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .btn-pill {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: var(--text-primary);
+      padding: 6px 11px;
+      border-radius: 9px;
+      font-size: 0.76rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.18s;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .btn-pill:hover {
+      background: rgba(99, 102, 241, 0.2);
+      border-color: rgba(99, 102, 241, 0.45);
+    }
+
+    /* Main Container */
+    .container {
+      max-width: 1240px;
+      margin: 16px auto 0;
+      padding: 0 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 16px;
+      padding: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+    }
+
+    /* Input / Paste Stock List Panel */
+    .paste-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+
+    .paste-title {
+      font-size: 0.98rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: #e2e8f0;
+    }
+
+    .preset-btns {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .btn-preset {
+      background: rgba(56, 189, 248, 0.1);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      color: #7dd3fc;
+      padding: 5px 10px;
+      border-radius: 8px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .btn-preset:hover, .btn-preset.active {
+      background: rgba(56, 189, 248, 0.24);
+      border-color: #38bdf8;
+      color: #fff;
+    }
+
+    .paste-box-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .paste-textarea {
+      width: 100%;
+      min-height: 74px;
+      background: rgba(8, 11, 17, 0.75);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 11px;
+      padding: 10px 12px;
+      color: #f8fafc;
+      font-size: 0.85rem;
+      font-family: 'Outfit', 'Noto Sans TC', monospace;
+      resize: vertical;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .paste-textarea:focus {
+      border-color: var(--accent-indigo);
+      box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+    }
+
+    .paste-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .paste-btn-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .btn-run {
+      background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+      border: 1px solid rgba(129, 140, 248, 0.45);
+      color: #fff;
+      padding: 8px 16px;
+      border-radius: 10px;
+      font-size: 0.84rem;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35);
+      transition: all 0.18s;
+    }
+
+    .btn-run:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 18px rgba(99, 102, 241, 0.5);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      color: #cbd5e1;
+      padding: 8px 13px;
+      border-radius: 10px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.12);
+      color: #fff;
+    }
+
+    .btn-excel {
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      color: #34d399;
+      padding: 8px 14px;
+      border-radius: 10px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .btn-excel:hover {
+      background: rgba(16, 185, 129, 0.28);
+      color: #fff;
+    }
+
+    .btn-copy-tsv {
+      background: rgba(245, 158, 11, 0.14);
+      border: 1px solid rgba(245, 158, 11, 0.4);
+      color: #fbbf24;
+      padding: 8px 13px;
+      border-radius: 10px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .btn-copy-tsv:hover {
+      background: rgba(245, 158, 11, 0.26);
+      color: #fff;
+    }
+
+    /* Summary KPI Grid */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    @media (max-width: 640px) {
+      .kpi-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    .kpi-box {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 11px;
+      padding: 9px 12px;
+      text-align: center;
+    }
+
+    .kpi-label {
+      font-size: 0.72rem;
+      color: var(--text-secondary);
+      margin-bottom: 2px;
+    }
+
+    .kpi-val {
+      font-size: 1.15rem;
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Progress Bar */
+    .progress-wrap {
+      display: none;
+      margin: 10px 0;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(99, 102, 241, 0.25);
+      border-radius: 10px;
+      padding: 10px 12px;
+    }
+
+    .progress-top {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.76rem;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
+    }
+
+    .progress-track {
+      height: 6px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #6366f1, #38bdf8, #10b981);
+      transition: width 0.2s ease;
+    }
+
+    /* Filter & Sort Controls */
+    .controls-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 6px;
+    }
+
+    .search-input {
+      flex: 1;
+      min-width: 200px;
+      background: rgba(8, 11, 17, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 10px;
+      padding: 8px 12px;
+      color: #fff;
+      font-size: 0.84rem;
+      outline: none;
+    }
+
+    .search-input:focus {
+      border-color: var(--accent-indigo);
+    }
+
+    .sort-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .sort-btn {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: var(--text-secondary);
+      padding: 6px 10px;
+      border-radius: 8px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .sort-btn.active {
+      background: rgba(99, 102, 241, 0.2);
+      border-color: #6366f1;
+      color: #fff;
+    }
+
+    /* Responsive Table */
+    .table-wrap {
+      width: 100%;
+      overflow-x: auto;
+    }
+
+    table.margin-tbl {
+      width: 100%;
+      border-collapse: collapse;
+      font-variant-numeric: tabular-nums;
+    }
+
+    table.margin-tbl th {
+      text-align: right;
+      padding: 10px 8px;
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      white-space: nowrap;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    table.margin-tbl th:first-child {
+      text-align: left;
+    }
+
+    table.margin-tbl td {
+      padding: 10px 8px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      vertical-align: middle;
+      text-align: right;
+      font-size: 0.86rem;
+    }
+
+    table.margin-tbl td:first-child {
+      text-align: left;
+    }
+
+    table.margin-tbl tbody tr {
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    table.margin-tbl tbody tr:hover {
+      background: rgba(99, 102, 241, 0.08);
+    }
+
+    /* Hide desktop-only columns on narrow mobile screens so phone layout stays crisp */
+    @media (max-width: 767px) {
+      .col-desktop {
+        display: none;
+      }
+      table.margin-tbl th, table.margin-tbl td {
+        padding: 9px 5px;
+      }
+    }
+
+    .stock-code-badge {
+      display: inline-block;
+      background: rgba(99, 102, 241, 0.16);
+      border: 1px solid rgba(99, 102, 241, 0.35);
+      color: #a5b4fc;
+      font-weight: 700;
+      font-size: 0.76rem;
+      padding: 1px 6px;
+      border-radius: 5px;
+      margin-right: 4px;
+    }
+
+    .stock-name-txt {
+      font-weight: 700;
+      color: #f1f5f9;
+      font-size: 0.9rem;
+    }
+
+    .badge-tag {
+      display: inline-block;
+      font-size: 0.66rem;
+      font-weight: 700;
+      padding: 1px 5px;
+      border-radius: 4px;
+      margin-left: 4px;
+      vertical-align: middle;
+    }
+    .b-danger { background: rgba(16, 185, 129, 0.18); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.4); }
+    .b-warn   { background: rgba(245, 158, 11, 0.18); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4); }
+    .b-lock   { background: rgba(255, 77, 79, 0.18); color: #ff4d4f; border: 1px solid rgba(255, 77, 79, 0.4); }
+    .b-clean  { background: rgba(56, 189, 248, 0.18); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.4); }
+
+    .mini-bar {
+      width: 68px;
+      height: 5px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 3px;
+      overflow: hidden;
+      display: inline-flex;
+      margin-top: 3px;
+    }
+
+    /* Modal */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(6px);
+      z-index: 200;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 14px;
+    }
+
+    .modal-card {
+      background: #101624;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 18px;
+      width: 100%;
+      max-width: 640px;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 18px;
+      box-shadow: 0 24px 48px rgba(0, 0, 0, 0.6);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      padding-bottom: 10px;
+      margin-bottom: 12px;
+    }
+
+    .modal-close {
+      background: rgba(255, 255, 255, 0.08);
+      border: none;
+      color: #fff;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      font-size: 1.1rem;
+      cursor: pointer;
+    }
+
+    .toast-msg {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(16, 185, 129, 0.95);
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 99px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+      z-index: 300;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sticky Top Bar -->
+  <header class="top-bar">
+    <div class="top-bar-inner">
+      <div class="brand-wrap">
+        <span class="brand-logo">AhWinGo 融資維持率精算</span>
+        <span class="brand-tag">v4.0 雙引擎 (CM原版 + 客家頂規PRO)</span>
+      </div>
+      <div class="top-actions">
+        <button class="btn-pill" onclick="openIosGuideModal()">📱 iPhone 放桌面教學</button>
+        <button class="btn-pill" onclick="copyShareUrl()">🔗 複製網址傳給朋友</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Card 1: Stock List Input & Presets -->
+    <section class="card">
+      <div class="paste-header">
+        <div class="paste-title">
+          <span>📋 貼上股票代號清單（支援從 Excel / LINE 複製貼上任意文字或代號）</span>
+        </div>
+        <div class="preset-btns">
+          <button class="btn-preset" id="preset-btn-hot" onclick="loadPresetList('hot')">🔥 熱門 AI/光通訊 (25檔)</button>
+          <button class="btn-preset active" id="preset-btn-194" onclick="loadPresetList('watchlist194')">⭐ AhWinGo 觀察池 (194檔)</button>
+          <button class="btn-preset" id="preset-btn-custom" onclick="loadPresetList('saved')">💾 上次自訂清單</button>
+        </div>
+      </div>
+
+      <div class="paste-box-wrap">
+        <textarea id="stock-input-area" class="paste-textarea" placeholder="在此貼上股票代號（可用空白、逗號、換行隔開，或直接從 Excel 複製一整欄代號貼上，例如：2330 2317 6669 3163 6173 6944）..."></textarea>
+        <div class="paste-actions">
+          <div class="paste-btn-group">
+            <button class="btn-run" onclick="runFromTextarea(false)">🚀 立即精算這批股票</button>
+            <button class="btn-secondary" onclick="runFromTextarea(true)">➕ 追加入目前清單</button>
+            <button class="btn-secondary" onclick="clearTextarea()">🧹 清空輸入框</button>
+          </div>
+          <div class="paste-btn-group">
+            <button class="btn-copy-tsv" onclick="copyResultAsTSV()">📋 複製表格 (可直接貼回 Excel)</button>
+            <button class="btn-excel" onclick="exportToExcelCSV()">📥 下載 Excel 報表 (.csv)</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Progress Bar -->
+      <div id="calc-progress-wrap" class="progress-wrap">
+        <div class="progress-top">
+          <span id="calc-progress-text">正在抓取 2.5 年歷史日 K 與融資現償明細...</span>
+          <span id="calc-progress-pct">0%</span>
+        </div>
+        <div class="progress-track">
+          <div id="calc-progress-fill" class="progress-fill"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Card 2: Summary KPIs + Search + Sort + Table -->
+    <section class="card">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:10px;">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <h2 style="font-size:1.02rem; font-weight:700;">📊 個股融資維持率即時對照表</h2>
+          <span id="stock-total-badge" style="font-size:0.75rem; padding:2px 9px; border-radius:99px; background:rgba(56,189,248,0.14); color:#38bdf8; border:1px solid rgba(56,189,248,0.3); font-weight:700;">0 檔</span>
+          <span id="data-date-badge" style="font-size:0.73rem; color:var(--text-secondary);"></span>
+        </div>
+        <button class="btn-secondary" style="padding:5px 11px; font-size:0.76rem;" onclick="startCalculation(currentSymbols, true)">🔄 重新精算最新資料</button>
+      </div>
+
+      <!-- 4 KPI Cards -->
+      <div class="kpi-grid">
+        <div class="kpi-box">
+          <div class="kpi-label">清單平均 (PRO / CM)</div>
+          <div class="kpi-val" id="kpi-avg-maint" style="color:#f8fafc;">--%</div>
+        </div>
+        <div class="kpi-box">
+          <div class="kpi-label">💀 破 130% 追繳風暴</div>
+          <div class="kpi-val" id="kpi-below-130" style="color:#10b981;">0 檔</div>
+        </div>
+        <div class="kpi-box">
+          <div class="kpi-label">⚠️ &lt;140% 追繳警戒</div>
+          <div class="kpi-val" id="kpi-below-140" style="color:#f59e0b;">0 檔</div>
+        </div>
+        <div class="kpi-box">
+          <div class="kpi-label">🔥 &gt;166% 獲利鎖碼</div>
+          <div class="kpi-val" id="kpi-above-166" style="color:#ff4d4f;">0 檔</div>
+        </div>
+      </div>
+
+      <!-- Search & Sort Controls -->
+      <div class="controls-row">
+        <input type="text" id="table-search-input" class="search-input" placeholder="🔍 搜尋股票代號、名稱或標籤（如：破追繳、警戒、洗浮額、鎖碼）..." oninput="renderTable()">
+        <div class="sort-group">
+          <button class="sort-btn active" id="sbtn-proMaint" onclick="toggleSort('proMaint')">客家頂規 PRO ▲</button>
+          <button class="sort-btn" id="sbtn-cmMaint" onclick="toggleSort('cmMaint')">傳統付費版 CM</button>
+          <button class="sort-btn" id="sbtn-distressedPct" onclick="toggleSort('distressedPct')">破130%佔比</button>
+          <button class="sort-btn" id="sbtn-diffMaint" onclick="toggleSort('diffMaint')">校正差 (PRO-CM)</button>
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div class="table-wrap" style="margin-top:10px;">
+        <table class="margin-tbl">
+          <thead>
+            <tr>
+              <th onclick="toggleSort('proMaint')">個股 / 130%追繳價</th>
+              <th class="col-desktop" onclick="toggleSort('close')">最新收盤</th>
+              <th onclick="toggleSort('proMaint')">客家頂規 PRO</th>
+              <th onclick="toggleSort('cmMaint')">傳統 CM 原版</th>
+              <th class="col-desktop" onclick="toggleSort('diffMaint')">校正差 (PRO-CM)</th>
+              <th onclick="toggleSort('distressedPct')">破130%佔比 / 資變</th>
+              <th class="col-desktop" onclick="toggleSort('marginBalance')">融資餘額 (使用率)</th>
+            </tr>
+          </thead>
+          <tbody id="margin-tbody">
+            <tr><td colspan="7" style="text-align:center; padding:32px; color:var(--text-secondary);">準備載入精算資料...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <!-- Stock Detail 60-Day Chart & Cohort X-Ray Modal -->
+  <div id="detail-modal" class="modal-backdrop" onclick="if(event.target===this) closeDetailModal()">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div>
+          <h3 id="modal-stock-title" style="font-size:1.1rem; font-weight:800;">--</h3>
+          <div id="modal-stock-sub" style="font-size:0.75rem; color:var(--text-secondary); margin-top:2px;">--</div>
+        </div>
+        <button class="modal-close" onclick="closeDetailModal()">×</button>
+      </div>
+      <div id="modal-body-content"></div>
+    </div>
+  </div>
+
+  <!-- iOS Add to Home Screen Guide Modal -->
+  <div id="ios-guide-modal" class="modal-backdrop" onclick="if(event.target===this) closeIosGuideModal()">
+    <div class="modal-card" style="max-width:440px;">
+      <div class="modal-header">
+        <h3 style="font-size:1.05rem; font-weight:800;">📱 iPhone / iPad 免安裝放桌面教學</h3>
+        <button class="modal-close" onclick="closeIosGuideModal()">×</button>
+      </div>
+      <div style="font-size:0.86rem; color:#cbd5e1; line-height:1.65; display:flex; flex-direction:column; gap:10px;">
+        <p>不必透過 App Store 審查或安裝描述檔，只要 3 秒即可將本系統變成 iPhone 桌面獨立 App：</p>
+        <div style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:12px;">
+          <p><strong>步驟 1：</strong>使用 iPhone 的 <strong>Safari 瀏覽器</strong>開啟本網址。</p>
+          <p style="margin-top:6px;"><strong>步驟 2：</strong>點擊畫面正下方中間的「<strong>分享按鈕</strong> 📤（方框向上箭頭）」。</p>
+          <p style="margin-top:6px;"><strong>步驟 3：</strong>往下滑點選「<strong>加入主畫面 (Add to Home Screen)</strong>」➔ 點右上角「<strong>新增</strong>」即可！</p>
+        </div>
+        <p style="font-size:0.78rem; color:var(--text-secondary);">💡 電腦版 (Windows / Mac) 直接將本網址加入書籤，即可隨時貼上股票代號精算並一鍵複製或匯出 Excel！</p>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast-msg" class="toast-msg">已複製！</div>
+
+  <script>
+    // Embedded 194 Watchlist Stock Names & Default Pool
+    const STOCK_NAME_MAP = {"3163": "波若威", "3376": "新日興", "6188": "廣明", "7734": "印能科技", "6761": "穩得", "3363": "上詮", "3665": "貿聯-KY", "8261": "富鼎", "4971": "IET-KY", "6442": "光聖", "6693": "廣閎科", "2308": "台達電", "4979": "華星光", "6182": "合晶", "3526": "凡甲", "1519": "華城", "3131": "弘塑", "3583": "辛耘", "2467": "志聖", "3211": "順達", "8210": "勤誠", "4931": "新盛力", "3450": "聯鈞", "4991": "環宇-KY", "6781": "AES-KY", "6515": "穎崴", "4585": "達明", "6488": "環球晶", "8358": "金居", "7788": "松川精密", "2303": "聯電", "2337": "旺宏", "6257": "矽格", "5234": "達興材料", "6405": "悅城", "2345": "智邦", "2360": "致茂", "3042": "晶技", "7795": "長廣", "5536": "聖暉*", "7751": "竑騰", "6190": "萬泰科", "2481": "強茂", "6525": "捷敏-KY", "3587": "閎康", "8374": "羅昇", "8255": "朋程", "3060": "銘異", "9802": "鈺齊-KY", "6640": "均華", "3577": "泓格", "3016": "嘉晶", "5289": "宜鼎", "6215": "和椿", "3030": "德律", "1785": "光洋科", "2313": "華通", "6282": "康舒", "2359": "所羅門", "2351": "順德", "3178": "公準", "3675": "德微", "6139": "亞翔", "6274": "台燿", "5347": "世界", "3481": "群創", "3532": "台勝科", "2301": "光寶科", "6585": "鼎基", "4772": "台特化", "3265": "台星科", "3008": "大立光", "5340": "建榮", "2059": "川湖", "6548": "長科*", "6207": "雷科", "6187": "萬潤", "6138": "茂達", "8027": "鈦昇", "6285": "啟碁", "6223": "旺矽", "8091": "翔名", "6890": "來億-KY", "7769": "鴻勁", "3090": "日電貿", "3491": "昇達科", "6664": "群翊", "4749": "新應材", "5483": "中美晶", "6768": "志強-KY", "8086": "宏捷科", "6830": "汎銓", "6789": "采鈺", "2327": "國巨*", "5425": "台半", "2367": "燿華", "3264": "欣銓", "7703": "銳澤", "6271": "同欣電", "5285": "界霖", "3289": "宜特", "3455": "由田", "6669": "緯穎", "3413": "京鼎", "3081": "聯亞", "2455": "全新", "2368": "金像電", "5443": "均豪", "6153": "嘉聯益", "5284": "jpp-KY", "2454": "聯發科", "3260": "威剛", "3661": "世芯-KY", "8021": "尖點", "3026": "禾伸堂", "2449": "京元電子", "6510": "精測", "4958": "臻鼎-KY", "3551": "世禾", "6613": "朋億*", "2464": "盟立", "2383": "台光電", "6196": "帆宣", "6197": "佳必琪", "6239": "力成", "1513": "中興電", "6862": "三集瑞-KY", "2476": "鉅祥", "5243": "乙盛-KY", "4576": "大銀微系統", "3062": "建漢", "6691": "洋基工程", "1815": "富喬", "2404": "漢唐", "1503": "士電", "7822": "倍利科", "8046": "南電", "2324": "仁寶", "3162": "精確", "1597": "直得", "6173": "信昌電", "3689": "湧德", "2356": "英業達", "2376": "技嘉", "4906": "正文", "7750": "新代", "4540": "全球傳動", "3563": "牧德", "8042": "金山電", "6770": "力積電", "8299": "群聯", "3017": "奇鋐", "4571": "鈞興-KY", "6213": "聯茂", "8996": "高力", "3324": "雙鴻", "2408": "南亞科", "6667": "信紘科", "1802": "台玻", "3149": "正達", "2344": "華邦電", "6944": "兆聯實業", "3037": "欣興", "3605": "宏致", "4977": "眾達-KY", "2049": "上銀", "2605": "新興", "2382": "廣達", "3189": "景碩", "2317": "鴻海", "1504": "東元", "3380": "明泰", "3044": "健鼎", "2492": "華新科", "3231": "緯創", "3711": "日月光投控", "4938": "和碩", "2615": "萬海", "3533": "嘉澤", "3167": "大量", "4967": "十銓", "3006": "晶豪科", "3653": "健策", "6532": "瑞耘", "2609": "陽明", "6672": "騰輝電子-KY", "2603": "長榮", "3443": "創意", "3105": "穩懋", "3234": "光環", "5475": "德宏", "7610": "聯友金屬-創", "7828": "創新服務", "3485": "敘豐"};
+    const DEFAULT_194_LIST = Object.keys(STOCK_NAME_MAP);
+    const HOT_25_LIST = [
+      "2330", "2317", "2454", "2382", "3231", "6669", "3017", "3324", "3163", "3363",
+      "6442", "4979", "3450", "3443", "3661", "3665", "6173", "6944", "7734", "2603",
+      "1513", "1519", "2368", "2345", "3037"
+    ];
+
+    // Extra common Taiwan stock names fallback
+    const EXTRA_NAMES = {
+      "2330": "台積電", "2317": "鴻海", "2454": "聯發科", "2382": "廣達", "3231": "緯創",
+      "3017": "奇鋐", "3324": "雙鴻", "4979": "華星光", "3450": "聯鈞", "3661": "世芯-KY",
+      "1519": "華城", "2368": "金像電", "2345": "智邦", "3037": "欣興", "2609": "陽明",
+      "2615": "萬海", "2303": "聯電", "2308": "台達電", "2881": "富邦金", "2882": "國泰金"
+    };
+    Object.assign(STOCK_NAME_MAP, EXTRA_NAMES);
+
+    let currentSymbols = [];
+    let marginMemCache = {};
+    const finmindMarginRawCache = {};
+    let twseMarginRealtimeMap = null;
+    const MARGIN_CACHE_EXPIRY = 4 * 60 * 60 * 1000;
+
+    let sortField = "proMaint";
+    let sortAsc = true;
+
+    function showToast(msg) {
+      const el = document.getElementById("toast-msg");
+      if (!el) return;
+      el.innerText = msg;
+      el.style.display = "block";
+      setTimeout(() => { el.style.display = "none"; }, 2400);
+    }
+
+    function openIosGuideModal() {
+      document.getElementById("ios-guide-modal").style.display = "flex";
+    }
+    function closeIosGuideModal() {
+      document.getElementById("ios-guide-modal").style.display = "none";
+    }
+    function closeDetailModal() {
+      document.getElementById("detail-modal").style.display = "none";
+    }
+
+    function copyShareUrl() {
+      const url = window.location.href.split("?")[0];
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(url).then(() => showToast("✅ 已複製網頁版連結，可直接貼給朋友！"));
+      } else {
+        prompt("請複製以下網址分享給朋友：", url);
+      }
+    }
+
+    function getStockName(sym) {
+      return STOCK_NAME_MAP[sym] || "";
+    }
+
+    // Extract 4~6 digit stock codes from arbitrary pasted text (Excel column, LINE message, CSV, etc.)
+    function parseStockCodesFromText(text) {
+      if (!text) return [];
+      const matches = String(text).match(/\b(\d{4,6})\b/g) || [];
+      const seen = new Set();
+      const out = [];
+      for (const code of matches) {
+        if (!seen.has(code)) {
+          seen.add(code);
+          out.push(code);
+        }
+      }
+      return out;
+    }
+
+    function updateTextareaDisplay(symbols) {
+      const area = document.getElementById("stock-input-area");
+      if (!area) return;
+      area.value = symbols.map(s => {
+        const n = getStockName(s);
+        return n ? `${s}(${n})` : s;
+      }).join("  ");
+    }
+
+    function clearTextarea() {
+      const area = document.getElementById("stock-input-area");
+      if (area) {
+        area.value = "";
+        area.focus();
+      }
+    }
+
+    function setActivePresetBtn(id) {
+      ["preset-btn-hot", "preset-btn-194", "preset-btn-custom"].forEach(btnId => {
+        const b = document.getElementById(btnId);
+        if (b) b.classList.toggle("active", btnId === id);
+      });
+    }
+
+    function loadPresetList(type) {
+      if (type === "hot") {
+        setActivePresetBtn("preset-btn-hot");
+        currentSymbols = [...HOT_25_LIST];
+      } else if (type === "saved") {
+        setActivePresetBtn("preset-btn-custom");
+        try {
+          const saved = JSON.parse(localStorage.getItem("ahwingo_web_custom_symbols") || "[]");
+          if (Array.isArray(saved) && saved.length > 0) {
+            currentSymbols = saved;
+          } else {
+            showToast("尚無自訂清單紀錄，先為您載入熱門 25 檔");
+            currentSymbols = [...HOT_25_LIST];
+          }
+        } catch (e) {
+          currentSymbols = [...HOT_25_LIST];
+        }
+      } else {
+        setActivePresetBtn("preset-btn-194");
+        currentSymbols = [...DEFAULT_194_LIST];
+      }
+      updateTextareaDisplay(currentSymbols);
+      startCalculation(currentSymbols, false);
+    }
+
+    function runFromTextarea(appendMode = false) {
+      const area = document.getElementById("stock-input-area");
+      const parsed = parseStockCodesFromText(area ? area.value : "");
+      if (parsed.length === 0) {
+        showToast("⚠️ 請先在輸入框貼上至少 1 個四位數股票代號（如 2330）");
+        return;
+      }
+      if (appendMode) {
+        const merged = [...currentSymbols];
+        parsed.forEach(c => { if (!merged.includes(c)) merged.push(c); });
+        currentSymbols = merged;
+      } else {
+        currentSymbols = parsed;
+      }
+      try {
+        localStorage.setItem("ahwingo_web_custom_symbols", JSON.stringify(currentSymbols));
+      } catch (e) {}
+      setActivePresetBtn("preset-btn-custom");
+      updateTextareaDisplay(currentSymbols);
+      startCalculation(currentSymbols, false);
+    }
+
+    function getCachedMarginResult(symbol) {
+      if (marginMemCache[symbol] && (Date.now() - marginMemCache[symbol].timestamp < MARGIN_CACHE_EXPIRY)) {
+        const mem = marginMemCache[symbol];
+        if (mem.hasMargin || mem.isTrueZeroMargin) return mem;
+      }
+      const cacheKey = `margin_web_v4_${symbol}`;
+      try {
+        const raw = localStorage.getItem(cacheKey);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (parsed && (Date.now() - parsed.timestamp < MARGIN_CACHE_EXPIRY)) {
+            if (parsed.hasMargin || parsed.isTrueZeroMargin) {
+              if (parsed.stockName) STOCK_NAME_MAP[symbol] = parsed.stockName;
+              marginMemCache[symbol] = parsed;
+              return parsed;
+            }
+          }
+        }
+      } catch (e) {}
+      return null;
+    }
+
+    function saveCachedMarginResult(symbol, dataObj) {
+      marginMemCache[symbol] = dataObj;
+      if (!dataObj.hasMargin && !dataObj.isTrueZeroMargin) return;
+      const cacheKey = `margin_web_v4_${symbol}`;
+      try {
+        localStorage.setItem(cacheKey, JSON.stringify(dataObj));
+      } catch (e) {}
+    }
+
+    async function fetchCnyesPriceHistory(symbol) {
+      const nowTs = Math.floor(Date.now() / 1000);
+      const fromTs = nowTs - 86400 * 920;
+      const priceUrl = `https://ws.api.cnyes.com/ws/api/v1/charting/history?resolution=D&symbol=TWS:${symbol}:STOCK&from=${nowTs}&to=${fromTs}&quote=1`;
+      const pRes = await fetch(priceUrl).then(r => r.json());
+      const rawPriceData = (pRes && pRes.statusCode === 200 && pRes.data) ? pRes.data : null;
+
+      if (!rawPriceData || !Array.isArray(rawPriceData.t) || rawPriceData.t.length === 0) {
+        return null;
+      }
+
+      // Auto-extract official Chinese stock name from cnyes quote object
+      if (rawPriceData.quote && rawPriceData.quote["200009"]) {
+        STOCK_NAME_MAP[symbol] = String(rawPriceData.quote["200009"]).trim();
+      }
+
+      const tArr = rawPriceData.t || [];
+      const oArr = rawPriceData.o || [];
+      const hArr = rawPriceData.h || [];
+      const lArr = rawPriceData.l || [];
+      const cArr = rawPriceData.c || [];
+      const vArr = rawPriceData.v || [];
+      const vwapArr = rawPriceData.vwap || [];
+
+      const priceList = [];
+      for (let i = 0; i < tArr.length; i++) {
+        const closeVal = parseFloat(cArr[i]);
+        if (!closeVal || isNaN(closeVal) || closeVal <= 0) continue;
+
+        const twDate = new Date((tArr[i] + 8 * 3600) * 1000);
+        const yyyy = twDate.getUTCFullYear();
+        const mm = String(twDate.getUTCMonth() + 1).padStart(2, "0");
+        const dd = String(twDate.getUTCDate()).padStart(2, "0");
+        const dateStr = `${yyyy}-${mm}-${dd}`;
+
+        const openVal = (oArr[i] !== null && oArr[i] !== undefined && oArr[i] > 0) ? parseFloat(oArr[i]) : closeVal;
+        const highVal = (hArr[i] !== null && hArr[i] !== undefined && hArr[i] > 0) ? parseFloat(hArr[i]) : closeVal;
+        const lowVal = (lArr[i] !== null && lArr[i] !== undefined && lArr[i] > 0) ? parseFloat(lArr[i]) : closeVal;
+        const volLots = (vArr[i] !== null && vArr[i] !== undefined && vArr[i] > 0) ? parseFloat(vArr[i]) : 1000;
+        const volShares = volLots * 1000;
+
+        const vwapVal = (vwapArr[i] !== null && vwapArr[i] !== undefined && vwapArr[i] > 0)
+          ? parseFloat(vwapArr[i])
+          : ((highVal + lowVal + closeVal) / 3.0);
+
+        priceList.push({
+          date: dateStr,
+          open: openVal,
+          close: closeVal,
+          Trading_Volume: volShares,
+          Trading_money: vwapVal * volShares
+        });
+      }
+
+      priceList.sort((a, b) => a.date.localeCompare(b.date));
+      return priceList;
+    }
+
+    async function fetchCnyesMarginFallback(symbol) {
+      const nowTs = Math.floor(Date.now() / 1000);
+      const fromTs = nowTs - 86400 * 920;
+      const marginUrl = `https://marketinfo.api.cnyes.com/mi/api/v1/TWS%3A${symbol}%3ASTOCK/marginTrading?from=${nowTs}&to=${fromTs}`;
+      const mRes = await fetch(marginUrl).then(r => r.json());
+      const rawMargin = (mRes && mRes.statusCode === 200 && Array.isArray(mRes.data)) ? mRes.data : [];
+
+      if (rawMargin.length === 0) {
+        return { marginList: [], isConfirmedZero: true, isExactFinMindMargin: false };
+      }
+
+      const mSorted = [...rawMargin].sort((a, b) => a.date.localeCompare(b.date));
+      const marginList = [];
+
+      for (let i = 0; i < mSorted.length; i++) {
+        const m = mSorted[i];
+        const dateStr = String(m.date).replace(/\//g, "-");
+        const mBuy = parseFloat(m.marginBuy) || 0;
+        const mSell = parseFloat(m.marginSell) || 0;
+        const mBal = parseFloat(m.marginRemaining) || 0;
+        const prevBal = i > 0 ? (parseFloat(mSorted[i - 1].marginRemaining) || 0) : mBal;
+
+        const impliedOutflow = i > 0 ? Math.max(mSell, prevBal + mBuy - mBal) : mSell;
+        const mRepay = Math.max(0, impliedOutflow - mSell);
+
+        const usedPct = parseFloat(m.marginUsedPercent) || 0;
+        const estLimit = (usedPct > 0 && mBal > 0) ? Math.round(mBal / (usedPct / 100.0)) : 0;
+        const shortBal = parseFloat(m.shortRemaining) || 0;
+
+        marginList.push({
+          date: dateStr,
+          stock_id: symbol,
+          MarginPurchaseBuy: mBuy,
+          MarginPurchaseSell: mSell,
+          MarginPurchaseCashRepayment: mRepay,
+          MarginPurchaseYesterdayBalance: prevBal,
+          MarginPurchaseTodayBalance: mBal,
+          MarginPurchaseLimit: estLimit,
+          ShortSaleTodayBalance: shortBal
+        });
+      }
+
+      return { marginList, isConfirmedZero: false, isExactFinMindMargin: false };
+    }
+
+    async function fetchHybridMarginAndPrice(symbol) {
+      const startDate = "2024-05-01";
+      const cachedFm = finmindMarginRawCache[symbol];
+
+      const pricePromise = fetchCnyesPriceHistory(symbol).catch(() => null);
+      const fmMarginPromise = cachedFm
+        ? Promise.resolve({ status: 200, data: cachedFm })
+        : fetch(`https://api.finmindtrade.com/api/v4/data?dataset=TaiwanStockMarginPurchaseShortSale&data_id=${symbol}&start_date=${startDate}`)
+            .then(r => r.json())
+            .catch(() => null);
+
+      let [priceList, fmRes] = await Promise.all([pricePromise, fmMarginPromise]);
+
+      if (!priceList || priceList.length === 0) {
+        try {
+          const pRes = await fetch(`https://api.finmindtrade.com/api/v4/data?dataset=TaiwanStockPrice&data_id=${symbol}&start_date=${startDate}`).then(r => r.json());
+          if (pRes && pRes.status === 200 && Array.isArray(pRes.data) && pRes.data.length > 0) {
+            priceList = pRes.data;
+          }
+        } catch (e) {
+          priceList = null;
+        }
+      }
+
+      if (!priceList || priceList.length === 0) return null;
+
+      if (fmRes && fmRes.status === 200 && Array.isArray(fmRes.data)) {
+        finmindMarginRawCache[symbol] = fmRes.data;
+        return {
+          marginList: [...fmRes.data],
+          priceList,
+          isConfirmedZero: fmRes.data.length === 0,
+          isExactFinMindMargin: true
+        };
+      }
+
+      try {
+        const fallback = await fetchCnyesMarginFallback(symbol);
+        return {
+          marginList: fallback.marginList,
+          priceList,
+          isConfirmedZero: fallback.isConfirmedZero,
+          isExactFinMindMargin: false
+        };
+      } catch (e) {
+        return null;
+      }
+    }
+
+    async function fetchAndComputeStockMargin(symbol, forceRefresh = false) {
+      const previousValid = getCachedMarginResult(symbol);
+      if (!forceRefresh && previousValid) return previousValid;
+
+      let fetched = null;
+      try {
+        fetched = await fetchHybridMarginAndPrice(symbol);
+      } catch (e) {
+        fetched = null;
+      }
+
+      if (!fetched) {
+        if (previousValid) return previousValid;
+        const busyObj = {
+          timestamp: Date.now(),
+          symbol,
+          stockName: getStockName(symbol),
+          hasMargin: false,
+          isTrueZeroMargin: false,
+          msg: "連線忙碌，請點重算"
+        };
+        marginMemCache[symbol] = busyObj;
+        return busyObj;
+      }
+
+      const marginList = fetched.marginList || [];
+      const priceList = fetched.priceList || [];
+      const isExactFinMindMargin = Boolean(fetched.isExactFinMindMargin);
+
+      if (marginList.length === 0 || priceList.length === 0) {
+        const emptyObj = {
+          timestamp: Date.now(),
+          symbol,
+          stockName: getStockName(symbol),
+          hasMargin: false,
+          isTrueZeroMargin: Boolean(fetched.isConfirmedZero),
+          msg: "無融資交易"
+        };
+        saveCachedMarginResult(symbol, emptyObj);
+        return emptyObj;
+      }
+
+      marginList.sort((a, b) => a.date.localeCompare(b.date));
+      priceList.sort((a, b) => a.date.localeCompare(b.date));
+
+      const priceByDate = {};
+      priceList.forEach(p => { priceByDate[p.date] = p; });
+
+      const rows = [];
+      let missingPriceDays = 0;
+      for (let i = 0; i < marginList.length; i++) {
+        const m = marginList[i];
+        const p = priceByDate[m.date];
+        if (!p || !(parseFloat(p.close) > 0)) {
+          if (i === 0 ||
+              m.MarginPurchaseTodayBalance !== marginList[i - 1].MarginPurchaseTodayBalance ||
+              m.MarginPurchaseBuy !== marginList[i - 1].MarginPurchaseBuy) {
+            missingPriceDays++;
+          }
+          continue;
+        }
+
+        const mBuy = parseFloat(m.MarginPurchaseBuy) || 0;
+        const mSell = parseFloat(m.MarginPurchaseSell) || 0;
+        let mRepay = parseFloat(m.MarginPurchaseCashRepayment) || 0;
+        const mBal = parseFloat(m.MarginPurchaseTodayBalance) || 0;
+        const mYest = parseFloat(m.MarginPurchaseYesterdayBalance) || 0;
+        const prevRawMarginBal = i > 0 ? (parseFloat(marginList[i - 1].MarginPurchaseTodayBalance) || 0) : mBal;
+
+        const impliedYest = (isExactFinMindMargin && mYest > 0) ? mYest : (mBal - mBuy + mSell);
+        const isCapReductionRelist = (missingPriceDays >= 3 && prevRawMarginBal > 0 && impliedYest < prevRawMarginBal * 0.92);
+        if (isCapReductionRelist && !isExactFinMindMargin) {
+          mRepay = 0;
+        }
+
+        rows.push({
+          date: m.date,
+          open: parseFloat(p.open) || 0,
+          close: parseFloat(p.close) || 0,
+          turnover_value: parseFloat(p.Trading_money) || 0,
+          turnover_volume: parseFloat(p.Trading_Volume) || 0,
+          margin_buy: mBuy,
+          margin_sell: mSell,
+          margin_repay: mRepay,
+          margin_balance: mBal,
+          margin_yest: mYest,
+          margin_limit: parseFloat(m.MarginPurchaseLimit) || 0,
+          short_balance: parseFloat(m.ShortSaleTodayBalance) || 0,
+          is_cap_reduction_relist: isCapReductionRelist
+        });
+        missingPriceDays = 0;
+      }
+
+      const n = rows.length;
+      if (n === 0 || rows[n - 1].margin_balance <= 0) {
+        const noBalObj = {
+          timestamp: Date.now(),
+          symbol,
+          stockName: getStockName(symbol),
+          hasMargin: false,
+          isTrueZeroMargin: true,
+          msg: "目前融資餘額為 0"
+        };
+        saveCachedMarginResult(symbol, noBalObj);
+        return noBalObj;
+      }
+
+      const margin_ratio = 0.6;
+      const cm_cost = new Array(n).fill(0);
+      const cm_maint_ratio = new Array(n).fill(0);
+      const pro_cost = new Array(n).fill(0);
+      const pro_maint_ratio = new Array(n).fill(0);
+      let lots = [];
+
+      for (let i = 0; i < n; i++) {
+        const close_p = rows[i].close;
+        const vwap_p = (rows[i].turnover_volume > 0 && rows[i].turnover_value > 0)
+          ? (rows[i].turnover_value / rows[i].turnover_volume)
+          : close_p;
+
+        const m_buy = rows[i].margin_buy;
+        const m_sell = rows[i].margin_sell;
+        const m_repay = rows[i].margin_repay;
+        const m_bal = rows[i].margin_balance;
+        const is_relist = Boolean(rows[i].is_cap_reduction_relist);
+
+        if (m_bal <= 0) {
+          cm_cost[i] = 0.0;
+          pro_cost[i] = 0.0;
+          lots = [];
+          continue;
+        }
+
+        // 演算法 A：100% 復刻 CMoney 原版遞迴公式
+        const prev_bal = i > 0 ? rows[i - 1].margin_balance : 0;
+        if (i === 0 || cm_cost[i - 1] <= 0 || prev_bal <= 0 || is_relist) {
+          cm_cost[i] = close_p;
+        } else {
+          const prev_cost = cm_cost[i - 1];
+          const retained_lots = isExactFinMindMargin
+            ? Math.max(0, prev_bal - m_sell - m_repay)
+            : Math.max(0, m_bal - m_buy);
+          cm_cost[i] = m_bal > 0 ? ((retained_lots * prev_cost + m_buy * close_p) / m_bal) : close_p;
+        }
+        cm_maint_ratio[i] = (close_p / (cm_cost[i] * margin_ratio)) * 100.0;
+
+        // 演算法 B：客家人頂規版 (真實 VWAP + 破 135% 危急批次 50% 優先斷頭扣減)
+        if (i === 0 || lots.length === 0 || is_relist) {
+          lots = [[vwap_p, m_bal]];
+        } else {
+          const outflow = m_sell + m_repay;
+          if (outflow > 0 && lots.length > 0) {
+            const distressed_Threshold = close_p / (1.35 * margin_ratio);
+            let panic_outflow = outflow * 0.5;
+            const normal_outflow = outflow - panic_outflow;
+
+            lots.sort((a, b) => b[0] - a[0]);
+            for (let k = 0; k < lots.length; k++) {
+              if (panic_outflow <= 0) break;
+              if (lots[k][0] >= distressed_Threshold) {
+                const deduct = Math.min(lots[k][1], panic_outflow);
+                lots[k][1] -= deduct;
+                panic_outflow -= deduct;
+              }
+            }
+
+            const remaining_outflow = normal_outflow + panic_outflow;
+            let total_existing = 0;
+            for (let k = 0; k < lots.length; k++) total_existing += lots[k][1];
+            if (total_existing > 0 && remaining_outflow > 0) {
+              const scale = Math.max(0.0, (total_existing - remaining_outflow) / total_existing);
+              for (let k = 0; k < lots.length; k++) lots[k][1] *= scale;
+            }
+            lots = lots.filter(lot => lot[1] > 1e-4);
+          }
+
+          if (m_buy > 0) lots.push([vwap_p, m_buy]);
+
+          let curr_total = 0;
+          for (let k = 0; k < lots.length; k++) curr_total += lots[k][1];
+          if (curr_total > 0) {
+            const align_ratio = m_bal / curr_total;
+            for (let k = 0; k < lots.length; k++) lots[k][1] *= align_ratio;
+          } else {
+            lots = [[vwap_p, m_bal]];
+          }
+        }
+
+        let weighted_sum = 0;
+        for (let k = 0; k < lots.length; k++) weighted_sum += lots[k][0] * lots[k][1];
+        pro_cost[i] = weighted_sum / m_bal;
+        pro_maint_ratio[i] = (close_p / (pro_cost[i] * margin_ratio)) * 100.0;
+      }
+
+      const latestMarginRow = rows[n - 1];
+      const lastPrice = priceList[priceList.length - 1];
+      let latestClose = latestMarginRow.close;
+      let latestPriceDate = latestMarginRow.date;
+      let finalCmCost = cm_cost[n - 1];
+      let finalProCost = pro_cost[n - 1];
+      let isLiveEstimate = false;
+
+      if (lastPrice && lastPrice.date > latestMarginRow.date && parseFloat(lastPrice.close) > 0) {
+        latestClose = parseFloat(lastPrice.close);
+        latestPriceDate = lastPrice.date;
+        isLiveEstimate = true;
+      }
+
+      const finalCmMaint = (latestClose / (finalCmCost * margin_ratio)) * 100.0;
+      const finalProMaint = (latestClose / (finalProCost * margin_ratio)) * 100.0;
+      const diffMaint = finalProMaint - finalCmMaint;
+
+      const mBalNow = latestMarginRow.margin_balance;
+      let distressedLots = 0, warningLots = 0, normalTrapLots = 0, profitLots = 0;
+      for (let k = 0; k < lots.length; k++) {
+        const lotCost = lots[k][0];
+        const lotVol = lots[k][1];
+        const lotMaint = (latestClose / (lotCost * margin_ratio)) * 100.0;
+        if (lotMaint < 130.0) distressedLots += lotVol;
+        else if (lotMaint < 140.0) warningLots += lotVol;
+        else if (lotMaint < 166.67) normalTrapLots += lotVol;
+        else profitLots += lotVol;
+      }
+
+      const distressedPct = mBalNow > 0 ? (distressedLots / mBalNow) * 100.0 : 0;
+      const warningPct = mBalNow > 0 ? (warningLots / mBalNow) * 100.0 : 0;
+      const normalTrapPct = mBalNow > 0 ? (normalTrapLots / mBalNow) * 100.0 : 0;
+      const profitPct = mBalNow > 0 ? (profitLots / mBalNow) * 100.0 : 0;
+
+      const marginCallPrice = finalProCost * margin_ratio * 1.30;
+      const bufferPct = latestClose > 0 ? ((latestClose - marginCallPrice) / latestClose) * 100.0 : 0;
+
+      const prev1Idx = Math.max(0, n - 2);
+      const prev5Idx = Math.max(0, n - 6);
+      const marginChange1d = Math.round(mBalNow - rows[prev1Idx].margin_balance);
+      const marginChange5d = Math.round(mBalNow - rows[prev5Idx].margin_balance);
+      const marginUsagePct = latestMarginRow.margin_limit > 0
+        ? (mBalNow / latestMarginRow.margin_limit) * 100.0 : 0;
+      const shortMarginRatio = mBalNow > 0
+        ? (latestMarginRow.short_balance / mBalNow) * 100.0 : 0;
+
+      const startIdx = Math.max(0, n - 60);
+      const histDates = [], histCloses = [], histCmMaint = [], histProMaint = [], histBalances = [];
+      for (let i = startIdx; i < n; i++) {
+        histDates.push(rows[i].date.slice(5));
+        histCloses.push(Number(rows[i].close.toFixed(2)));
+        histCmMaint.push(Number(cm_maint_ratio[i].toFixed(2)));
+        histProMaint.push(Number(pro_maint_ratio[i].toFixed(2)));
+        histBalances.push(Math.round(rows[i].margin_balance));
+      }
+
+      const resultObj = {
+        timestamp: Date.now(),
+        symbol,
+        stockName: getStockName(symbol),
+        hasMargin: true,
+        latestMarginDate: latestMarginRow.date,
+        latestPriceDate,
+        isLiveEstimate,
+        close: Number(latestClose.toFixed(2)),
+        cmCost: Number(finalCmCost.toFixed(2)),
+        cmMaint: Number(finalCmMaint.toFixed(2)),
+        proCost: Number(finalProCost.toFixed(2)),
+        proMaint: Number(finalProMaint.toFixed(2)),
+        diffMaint: Number(diffMaint.toFixed(2)),
+        marginCallPrice: Number(marginCallPrice.toFixed(2)),
+        bufferPct: Number(bufferPct.toFixed(1)),
+        marginBalance: Math.round(mBalNow),
+        marginChange1d,
+        marginChange5d,
+        marginUsagePct: Number(marginUsagePct.toFixed(1)),
+        shortBalance: Math.round(latestMarginRow.short_balance),
+        shortMarginRatio: Number(shortMarginRatio.toFixed(1)),
+        distressedLots: Math.round(distressedLots),
+        warningLots: Math.round(warningLots),
+        normalTrapLots: Math.round(normalTrapLots),
+        profitLots: Math.round(profitLots),
+        distressedPct: Number(distressedPct.toFixed(1)),
+        warningPct: Number(warningPct.toFixed(1)),
+        normalTrapPct: Number(normalTrapPct.toFixed(1)),
+        profitPct: Number(profitPct.toFixed(1)),
+        history60: { dates: histDates, closes: histCloses, cmMaint: histCmMaint, proMaint: histProMaint, balances: histBalances }
+      };
+
+      saveCachedMarginResult(symbol, resultObj);
+      return resultObj;
+    }
+
+    function getBadges(item) {
+      if (!item || !item.hasMargin) return { primaryHtml: "", fullHtml: "", textSearch: "" };
+      const tags = [];
+      if (item.proMaint < 130) {
+        tags.push({ cls: "b-danger", short: "💀破追繳", full: "💀斷頭風暴" });
+      } else if (item.proMaint < 140 || (item.distressedPct + item.warningPct) >= 35) {
+        tags.push({ cls: "b-warn", short: "⚠️警戒", full: "⚠️追繳警戒" });
+      } else if (item.proMaint >= 166.7) {
+        tags.push({ cls: "b-lock", short: "🔥鎖碼", full: "🔥強勢鎖碼" });
+      }
+      if (item.diffMaint >= 2.5 && item.marginChange5d <= 0) {
+        tags.push({ cls: "b-clean", short: "🧹洗浮額", full: "🧹浮額清洗" });
+      }
+      const primaryHtml = tags.length > 0 ? `<span class="badge-tag ${tags[0].cls}">${tags[0].short}</span>` : "";
+      const fullHtml = tags.map(t => `<span class="badge-tag ${t.cls}">${t.full}</span>`).join(" ");
+      const textSearch = tags.map(t => `${t.short} ${t.full}`).join(" ");
+      return { primaryHtml, fullHtml, textSearch };
+    }
+
+    function getMaintColor(val) {
+      if (val < 130) return "#10b981";
+      if (val < 140) return "#f59e0b";
+      if (val >= 166.7) return "#ff4d4f";
+      return "#38bdf8";
+    }
+
+    async function startCalculation(symbols, forceRefresh = false) {
+      if (!symbols || symbols.length === 0) return;
+      document.getElementById("stock-total-badge").innerText = `${symbols.length} 檔`;
+
+      const toFetch = symbols.filter(s => forceRefresh || !getCachedMarginResult(s));
+      const progWrap = document.getElementById("calc-progress-wrap");
+      const progFill = document.getElementById("calc-progress-fill");
+      const progText = document.getElementById("calc-progress-text");
+      const progPct = document.getElementById("calc-progress-pct");
+
+      if (toFetch.length > 0) {
+        progWrap.style.display = "block";
+        let done = 0;
+        const total = toFetch.length;
+        const BATCH = 5;
+        for (let i = 0; i < total; i += BATCH) {
+          const slice = toFetch.slice(i, i + BATCH);
+          await Promise.all(slice.map(async sym => {
+            await fetchAndComputeStockMargin(sym, forceRefresh);
+            done++;
+            const pct = Math.round((done / total) * 100);
+            progFill.style.width = `${pct}%`;
+            progPct.innerText = `${pct}%`;
+            progText.innerText = `正在精算 ${sym} ${getStockName(sym)} (${done}/${total})...`;
+          }));
+          renderTable();
+        }
+        progWrap.style.display = "none";
+        updateTextareaDisplay(currentSymbols);
+      } else {
+        renderTable();
+      }
+    }
+
+    function toggleSort(field) {
+      if (sortField === field) {
+        sortAsc = !sortAsc;
+      } else {
+        sortField = field;
+        sortAsc = (field === "proMaint" || field === "cmMaint");
+      }
+      ["proMaint", "cmMaint", "distressedPct", "diffMaint"].forEach(f => {
+        const b = document.getElementById(`sbtn-${f}`);
+        if (!b) return;
+        const labels = {
+          proMaint: "客家頂規 PRO",
+          cmMaint: "傳統付費版 CM",
+          distressedPct: "破130%佔比",
+          diffMaint: "校正差 (PRO-CM)"
+        };
+        if (f === sortField) {
+          b.classList.add("active");
+          b.innerText = `${labels[f]} ${sortAsc ? "▲" : "▼"}`;
+        } else {
+          b.classList.remove("active");
+          b.innerText = labels[f];
+        }
+      });
+      renderTable();
+    }
+
+    function getSortedData() {
+      const q = (document.getElementById("table-search-input")?.value || "").trim().toLowerCase();
+      const valid = [];
+      const noMargin = [];
+
+      currentSymbols.forEach(sym => {
+        const item = getCachedMarginResult(sym) || marginMemCache[sym];
+        const name = (item && item.stockName) ? item.stockName : getStockName(sym);
+        const badges = getBadges(item);
+        if (q) {
+          const hay = `${sym} ${name} ${badges.textSearch}`.toLowerCase();
+          if (!hay.includes(q)) return;
+        }
+        if (item && item.hasMargin) {
+          valid.push({ ...item, name, badges });
+        } else {
+          noMargin.push({ symbol: sym, name, msg: item ? item.msg : "載入中..." });
+        }
+      });
+
+      // Update KPI summary across all valid stocks in currentSymbols
+      let sumPro = 0, sumCm = 0, c130 = 0, c140 = 0, c166 = 0, vCount = 0, latestDate = "";
+      currentSymbols.forEach(sym => {
+        const it = getCachedMarginResult(sym) || marginMemCache[sym];
+        if (it && it.hasMargin) {
+          vCount++;
+          sumPro += it.proMaint;
+          sumCm += it.cmMaint;
+          if (it.proMaint < 130) c130++;
+          if (it.proMaint < 140) c140++;
+          if (it.proMaint >= 166.7) c166++;
+          if (it.latestMarginDate > latestDate) latestDate = it.latestMarginDate;
+        }
+      });
+
+      document.getElementById("kpi-avg-maint").innerText = vCount > 0
+        ? `${(sumPro / vCount).toFixed(1)}% / ${(sumCm / vCount).toFixed(1)}%` : "--%";
+      document.getElementById("kpi-below-130").innerText = `${c130} 檔`;
+      document.getElementById("kpi-below-140").innerText = `${c140} 檔`;
+      document.getElementById("kpi-above-166").innerText = `${c166} 檔`;
+      if (latestDate) {
+        document.getElementById("data-date-badge").innerText = `資料基準日：${latestDate}`;
+      }
+
+      valid.sort((a, b) => {
+        const va = Number(a[sortField]) || 0;
+        const vb = Number(b[sortField]) || 0;
+        return sortAsc ? (va - vb) : (vb - va);
+      });
+
+      return { valid, noMargin };
+    }
+
+    function renderTable() {
+      const tbody = document.getElementById("margin-tbody");
+      if (!tbody) return;
+      const { valid, noMargin } = getSortedData();
+
+      if (valid.length === 0 && noMargin.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:28px; color:var(--text-secondary);">無符合搜尋條件的個股</td></tr>`;
+        return;
+      }
+
+      let html = "";
+      valid.forEach(item => {
+        const proColor = getMaintColor(item.proMaint);
+        const cmColor = getMaintColor(item.cmMaint);
+        const diffSign = item.diffMaint >= 0 ? "+" : "";
+        const diffColor = item.diffMaint >= 0.5 ? "#38bdf8" : (item.diffMaint <= -0.5 ? "#f59e0b" : "var(--text-secondary)");
+        const chg5Sign = item.marginChange5d > 0 ? "+" : "";
+        const chg5Color = item.marginChange5d > 0 ? "#ff4d4f" : (item.marginChange5d < 0 ? "#10b981" : "var(--text-secondary)");
+
+        html += `
+          <tr onclick="openDetailModal('${item.symbol}')">
+            <td>
+              <div style="display:flex; align-items:center; flex-wrap:wrap; gap:2px;">
+                <span class="stock-code-badge">${item.symbol}</span>
+                <span class="stock-name-txt">${item.name || ""}</span>
+                ${item.badges.primaryHtml}
+              </div>
+              <div style="font-size:0.72rem; color:var(--text-secondary); margin-top:3px;">
+                現價 <strong style="color:#e2e8f0;">$${item.close}</strong> ｜ 追繳 <strong style="color:${item.close <= item.marginCallPrice ? '#10b981' : '#f59e0b'};">$${item.marginCallPrice}</strong>
+              </div>
+            </td>
+            <td class="col-desktop" style="font-weight:700;">$${item.close}</td>
+            <td>
+              <div style="font-size:0.98rem; font-weight:800; color:${proColor};">${item.proMaint.toFixed(2)}%</div>
+              <div style="font-size:0.71rem; color:var(--text-secondary);">成本 $${item.proCost}</div>
+            </td>
+            <td>
+              <div style="font-size:0.92rem; font-weight:700; color:${cmColor};">${item.cmMaint.toFixed(2)}%</div>
+              <div style="font-size:0.71rem; color:var(--text-secondary);">成本 $${item.cmCost}</div>
+            </td>
+            <td class="col-desktop" style="font-weight:700; color:${diffColor};">${diffSign}${item.diffMaint.toFixed(2)}%p</td>
+            <td>
+              <div style="font-size:0.78rem; font-weight:700; color:${item.distressedPct >= 25 ? '#10b981' : 'var(--text-primary)'};">
+                破130%: ${item.distressedPct.toFixed(1)}%
+              </div>
+              <div class="mini-bar">
+                <div style="width:${item.distressedPct}%; background:#10b981;"></div>
+                <div style="width:${item.warningPct}%; background:#f59e0b;"></div>
+                <div style="width:${item.normalTrapPct}%; background:#38bdf8;"></div>
+                <div style="width:${item.profitPct}%; background:#ff4d4f;"></div>
+              </div>
+              <div style="font-size:0.7rem; color:${chg5Color}; margin-top:2px;">5日資 ${chg5Sign}${item.marginChange5d}張</div>
+            </td>
+            <td class="col-desktop">
+              <div style="font-size:0.84rem; font-weight:700;">${item.marginBalance.toLocaleString()} 張</div>
+              <div style="font-size:0.7rem; color:var(--text-secondary);">使用率 ${item.marginUsagePct}% ｜ 券資 ${item.shortMarginRatio}%</div>
+            </td>
+          </tr>
+        `;
+      });
+
+      noMargin.forEach(nm => {
+        html += `
+          <tr style="opacity:0.55; cursor:default;">
+            <td>
+              <span class="stock-code-badge">${nm.symbol}</span>
+              <span class="stock-name-txt">${nm.name || ""}</span>
+            </td>
+            <td colspan="6" style="text-align:right; font-size:0.78rem; color:var(--text-secondary);">${nm.msg}</td>
+          </tr>
+        `;
+      });
+
+      tbody.innerHTML = html;
+    }
+
+    function openDetailModal(symbol) {
+      const item = getCachedMarginResult(symbol) || marginMemCache[symbol];
+      if (!item || !item.hasMargin) return;
+      const name = item.stockName || getStockName(symbol);
+      const badges = getBadges(item);
+
+      document.getElementById("modal-stock-title").innerHTML = `${symbol} ${name} ${badges.fullHtml}`;
+      document.getElementById("modal-stock-sub").innerText = `資料基準日：${item.latestMarginDate} ｜ 最新收盤價：$${item.close} ｜ 130%追繳臨界價：$${item.marginCallPrice}`;
+
+      const diffSign = item.diffMaint >= 0 ? "+" : "";
+      const body = document.getElementById("modal-body-content");
+      body.innerHTML = `
+        <div class="kpi-grid" style="margin-bottom:14px;">
+          <div class="kpi-box">
+            <div class="kpi-label">客家頂規 PRO 維持率</div>
+            <div class="kpi-val" style="color:${getMaintColor(item.proMaint)};">${item.proMaint.toFixed(2)}%</div>
+            <div style="font-size:0.72rem; color:var(--text-secondary);">均價成本 $${item.proCost}</div>
+          </div>
+          <div class="kpi-box">
+            <div class="kpi-label">傳統付費版 CM 維持率</div>
+            <div class="kpi-val" style="color:${getMaintColor(item.cmMaint)};">${item.cmMaint.toFixed(2)}%</div>
+            <div style="font-size:0.72rem; color:var(--text-secondary);">均價成本 $${item.cmCost}</div>
+          </div>
+          <div class="kpi-box">
+            <div class="kpi-label">頂規減傳統 (PRO-CM)</div>
+            <div class="kpi-val" style="color:#38bdf8;">${diffSign}${item.diffMaint.toFixed(2)}%p</div>
+            <div style="font-size:0.72rem; color:var(--text-secondary);">VWAP+斷頭優先校正</div>
+          </div>
+          <div class="kpi-box">
+            <div class="kpi-label">融資餘額 / 5日增減</div>
+            <div class="kpi-val" style="font-size:1.02rem;">${item.marginBalance.toLocaleString()} 張</div>
+            <div style="font-size:0.72rem; color:var(--text-secondary);">1日 ${item.marginChange1d > 0 ? '+' : ''}${item.marginChange1d} / 5日 ${item.marginChange5d > 0 ? '+' : ''}${item.marginChange5d}</div>
+          </div>
+        </div>
+
+        <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.07); border-radius:12px; padding:12px; margin-bottom:14px;">
+          <div style="font-size:0.82rem; font-weight:700; margin-bottom:8px;">🔬 客家頂規獨家：融資在途批次套牢結構解剖</div>
+          <div style="height:12px; background:rgba(255,255,255,0.08); border-radius:6px; overflow:hidden; display:flex; margin-bottom:10px;">
+            <div style="width:${item.distressedPct}%; background:#10b981;" title="破130%追繳區"></div>
+            <div style="width:${item.warningPct}%; background:#f59e0b;" title="130~140%警戒區"></div>
+            <div style="width:${item.normalTrapPct}%; background:#38bdf8;" title="140~166%套牢區"></div>
+            <div style="width:${item.profitPct}%; background:#ff4d4f;" title=">=166.7%獲利區"></div>
+          </div>
+          <div style="display:grid; grid-template-columns:repeat(2,1fr); gap:6px; font-size:0.76rem;">
+            <div>🟢 <strong>&lt;130% 追繳斷頭區：</strong>${item.distressedPct}% (${item.distressedLots}張)</div>
+            <div>🟡 <strong>130~140% 追繳警戒：</strong>${item.warningPct}% (${item.warningLots}張)</div>
+            <div>🔵 <strong>140~166% 一般套牢：</strong>${item.normalTrapPct}% (${item.normalTrapLots}張)</div>
+            <div>🔴 <strong>&ge;166.7% 獲利鎖碼：</strong>${item.profitPct}% (${item.profitLots}張)</div>
+          </div>
+        </div>
+
+        <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.07); border-radius:12px; padding:12px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.78rem; margin-bottom:6px;">
+            <strong>📈 近 60 日融資維持率雙曲線走勢</strong>
+            <span><span style="color:#a855f7;">━ 客家PRO</span> ｜ <span style="color:#94a3b8;">-- 傳統CM</span> ｜ <span style="color:#10b981;">┄ 130%追繳線</span></span>
+          </div>
+          <canvas id="modal-60d-canvas" width="580" height="210" style="width:100%; height:190px;"></canvas>
+        </div>
+      `;
+
+      document.getElementById("detail-modal").style.display = "flex";
+      setTimeout(() => draw60dChart(item.history60), 30);
+    }
+
+    function draw60dChart(h) {
+      const canvas = document.getElementById("modal-60d-canvas");
+      if (!canvas || !h || !h.dates || h.dates.length < 2) return;
+      const ctx = canvas.getContext("2d");
+      const W = canvas.width, H = canvas.height;
+      ctx.clearRect(0, 0, W, H);
+
+      const padL = 42, padR = 14, padT = 14, padB = 24;
+      const plotW = W - padL - padR;
+      const plotH = H - padT - padB;
+
+      const allVals = [...h.cmMaint, ...h.proMaint, 130, 166.7];
+      const minV = Math.floor(Math.min(...allVals) * 0.96);
+      const maxV = Math.ceil(Math.max(...allVals) * 1.03);
+      const rangeV = Math.max(10, maxV - minV);
+
+      const xOf = i => padL + (i / (h.dates.length - 1)) * plotW;
+      const yOf = v => padT + plotH - ((v - minV) / rangeV) * plotH;
+
+      // 130% line
+      const y130 = yOf(130);
+      ctx.strokeStyle = "rgba(16, 185, 129, 0.55)";
+      ctx.setLineDash([4, 4]);
+      ctx.beginPath();
+      ctx.moveTo(padL, y130);
+      ctx.lineTo(W - padR, y130);
+      ctx.stroke();
+
+      // CM dashed line
+      ctx.strokeStyle = "rgba(148, 163, 184, 0.75)";
+      ctx.lineWidth = 1.6;
+      ctx.setLineDash([3, 3]);
+      ctx.beginPath();
+      h.cmMaint.forEach((v, i) => {
+        if (i === 0) ctx.moveTo(xOf(i), yOf(v));
+        else ctx.lineTo(xOf(i), yOf(v));
+      });
+      ctx.stroke();
+
+      // PRO solid line
+      ctx.strokeStyle = "#a855f7";
+      ctx.lineWidth = 2.4;
+      ctx.setLineDash([]);
+      ctx.beginPath();
+      h.proMaint.forEach((v, i) => {
+        if (i === 0) ctx.moveTo(xOf(i), yOf(v));
+        else ctx.lineTo(xOf(i), yOf(v));
+      });
+      ctx.stroke();
+
+      // Labels
+      ctx.fillStyle = "#94a3b8";
+      ctx.font = "11px Outfit, sans-serif";
+      ctx.textAlign = "right";
+      ctx.fillText(`${maxV}%`, padL - 5, padT + 8);
+      ctx.fillText(`130%`, padL - 5, y130 + 4);
+      ctx.fillText(`${minV}%`, padL - 5, H - padB);
+
+      ctx.textAlign = "left";
+      ctx.fillText(h.dates[0], padL, H - 6);
+      ctx.textAlign = "right";
+      ctx.fillText(h.dates[h.dates.length - 1], W - padR, H - 6);
+    }
+
+    function buildExportRows() {
+      const { valid, noMargin } = getSortedData();
+      const headers = [
+        "排名", "股票代號", "股票名稱", "資料基準日", "最新收盤價",
+        "客家頂規維持率(%)", "傳統CM維持率(%)", "頂規減傳統差距(%p)",
+        "客家頂規均價成本", "傳統CM均價成本", "130%追繳臨界價", "安全緩衝(%)",
+        "破130%追繳張數", "破130%追繳佔比(%)", "130~140%警戒張數", "130~140%警戒佔比(%)",
+        "140~166%套牢張數", "140~166%套牢佔比(%)", ">=166.7%獲利張數", ">=166.7%獲利佔比(%)",
+        "最新融資餘額(張)", "1日融資增減(張)", "5日融資增減(張)", "融資使用率(%)",
+        "最新融券餘額(張)", "券資比(%)", "智慧籌碼診斷"
+      ];
+      const rows = [headers];
+      valid.forEach((item, idx) => {
+        rows.push([
+          idx + 1, item.symbol, item.name || "", item.latestMarginDate || "", item.close,
+          item.proMaint.toFixed(2), item.cmMaint.toFixed(2), item.diffMaint.toFixed(2),
+          item.proCost.toFixed(2), item.cmCost.toFixed(2), item.marginCallPrice.toFixed(2), item.bufferPct.toFixed(1),
+          item.distressedLots, item.distressedPct.toFixed(1), item.warningLots, item.warningPct.toFixed(1),
+          item.normalTrapLots, item.normalTrapPct.toFixed(1), item.profitLots, item.profitPct.toFixed(1),
+          item.marginBalance, item.marginChange1d, item.marginChange5d, item.marginUsagePct.toFixed(1),
+          item.shortBalance, item.shortMarginRatio.toFixed(1), item.badges.textSearch || "正常"
+        ]);
+      });
+      noMargin.forEach((nm, idx) => {
+        rows.push([
+          valid.length + idx + 1, nm.symbol, nm.name || "", "-", "-",
+          "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-",
+          0, 0, 0, 0, 0, 0, nm.msg
+        ]);
+      });
+      return rows;
+    }
+
+    function copyResultAsTSV() {
+      const rows = buildExportRows();
+      if (rows.length <= 1) {
+        showToast("⚠️ 尚無可複製的精算結果");
+        return;
+      }
+      const tsv = rows.map(r => r.join("\t")).join("\n");
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(tsv).then(() => {
+          showToast("✅ 已複製完整表格！打開 Excel 直接按 Ctrl+V 即可貼上分欄！");
+        });
+      } else {
+        showToast("⚠️ 您的瀏覽器不支援剪貼簿，請點「下載 Excel 報表」");
+      }
+    }
+
+    function exportToExcelCSV() {
+      const rows = buildExportRows();
+      if (rows.length <= 1) {
+        showToast("⚠️ 尚無可匯出的精算結果");
+        return;
+      }
+      const escapeCsv = val => {
+        const s = String(val ?? "");
+        if (s.includes(",") || s.includes('"') || s.includes("\n")) {
+          return `"${s.replace(/"/g, '""')}"`;
+        }
+        return s;
+      };
+      const csvContent = "\uFEFF" + rows.map(r => r.map(escapeCsv).join(",")).join("\r\n");
+      const now = new Date();
+      const y = now.getFullYear();
+      const m = String(now.getMonth() + 1).padStart(2, "0");
+      const d = String(now.getDate()).padStart(2, "0");
+      const fileName = `AhWinGo_融資維持率精算對照表_${y}${m}${d}.csv`;
+
+      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = fileName;
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(() => {
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }, 500);
+      showToast(`📥 已下載 ${fileName}（可直接用 Excel 開啟）`);
+    }
+
+    // Initialize on load: support ?stocks=2330,2317,6669 URL parameter or default to Watchlist 194
+    window.addEventListener("DOMContentLoaded", () => {
+      const params = new URLSearchParams(window.location.search);
+      const urlStocks = params.get("stocks");
+      if (urlStocks) {
+        const parsed = parseStockCodesFromText(urlStocks);
+        if (parsed.length > 0) {
+          currentSymbols = parsed;
+          setActivePresetBtn("preset-btn-custom");
+          updateTextareaDisplay(currentSymbols);
+          startCalculation(currentSymbols, false);
+          return;
+        }
+      }
+      loadPresetList("watchlist194");
+    });
+  </script>
+</body>
+</html>
